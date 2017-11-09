@@ -1,0 +1,33 @@
+{% load i18n %}
+<hr>
+<span class="pull-right text-muted" id="comment-helper" style="display: none"><small>{% trans 'Press Ctrl + Enter to post' %}</small></span>
+<h4><span class="comment-count">{{ article.get_comments.count }}</span> {% trans 'Comments' %}</h4>
+{% if request.user.is_authenticated %}
+    <div class="post-comment clearfix">
+        <form role="form" id="comment-form">
+        {% csrf_token %}
+        <input type="hidden" name="article" value="{{ article.pk }}">
+        <div class="user-portrait clearfix">
+            <img src="{{ user.profile.get_picture }}">
+        </div>
+        <div class="comment-input clearfix">
+            <textarea class="form-control" rows="1" placeholder="{% trans 'Write a comment...' %}" name="comment" id="comment"></textarea>
+        </div>
+        </form>
+    </div>
+{% else %}
+    <div class="well well-sm" id="comment-list" style="text-align: center">
+        <span>您尚未登录，请    </span>
+        <a href="{% url 'login' %}?next={{request.path}}" class="btn btn-default btn-sm" role="button" >Log In</a>
+        <span>    或    </span>
+        <a href="{% url 'signup' %}?next={{request.path}}" class="btn btn-primary btn-sm" role="button" style="margin-left:4px;">Sign Up</a>
+        <span>    后评论</span>
+    </div>
+{% endif %}
+<div class="well well-sm" id="comment-list">
+  {% for comment in article.get_comments %}
+    {% include 'articles/partial_article_comment.html' with comment=comment %}
+  {% empty %}
+    <div style="padding: .6em 0">{% trans 'Be the first one to comment!' %}</div>
+  {% endfor %}
+</div>

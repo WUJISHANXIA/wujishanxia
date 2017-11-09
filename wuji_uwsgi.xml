@@ -1,0 +1,7 @@
+<uwsgi>
+	<socket>:8077</socket>
+	<chdir>/home/www/wujishanxia</chdir>
+	<module>bootcamp.wsgi</module>
+	<processes>4</processes>
+	<daemonize>/home/www/logs/wujishanxia.log</daemonize>
+</uwsgi>

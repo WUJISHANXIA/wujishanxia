@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %} {% trans 'Articles' %} {% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'editormd/css/editormd.min.css' %}" />
+    <script src="{% static 'js/articles.js' %}"></script>
+
+    <script src="{% static 'editormd/js/jquery.min.js' %}"></script>
+    <script src="{% static 'editormd/js/editormd.js' %}?v=1"></script>
+    <script type="text/javascript">
+        var testEditor;
+
+        $(function() {
+            testEditor = editormd("test-editormd", {
+                width   : "100%",
+                height  : 480,
+                syncScrolling : "single",
+                saveHTMLToTextarea : true,
+                path    : "{% static 'editormd/lib/' %}"
+            });
+
+            $(".publish").click(function () {
+                $("input[name='status']").val("P");
+                $("#id_content").val(testEditor.getMarkdown());
+                $("form").submit();
+            });
+        });
+    </script>
+{% endblock head %}
+
+{% block main %}
+  <ol class="breadcrumb">
+    <li><a href="{% url 'articles' %}">{% trans 'Articles' %}</a></li>
+    <li class="active">{% trans 'Write Article' %}</li>
+  </ol>
+
+  <form action="{% url 'write' %}" method="post" role="form">
+    {% csrf_token %}
+    {{ form.status }}
+    {% for field in form.visible_fields %}
+      <div class="form-group{% if field.errors %} has-error{% endif %}">
+        <label for="{{ field.label }}" class="control-label">{{ field.label }}</label>
+        {% if field.label != 'Content' %}
+        {{ field }}
+        {% endif %}
+        {% if field.label == 'Content' %}
+          <div id="test-editormd">
+          {{ field }}
+          </div>
+         {% endif %}
+
+        {% if field.help_text %}
+          <span class="help-block">{{ field.help_text }}</span>
+        {% endif %}
+        {% for error in field.errors %}
+          <label class="control-label">{{ error }}</label>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <div class="form-group">
+      <button type="button" class="btn btn-primary publish">{% trans 'Publish' %}</button>
+      <button type="button" class="btn btn-default draft">{% trans 'Save Draft' %}</button>
+      {# <button type="button" class="btn btn-default preview" data-toggle="modal" data-target="#preview">{% trans 'Preview' %}</button> #}
+      <a href="{% url 'articles' %}" class="btn btn-default">{% trans 'Cancel' %}</a>
+    </div>
+  </form>
+
+  <div class="modal fade" id="preview">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Article Preview</h4>
+        </div>
+        <div class="modal-body"></div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock main %}

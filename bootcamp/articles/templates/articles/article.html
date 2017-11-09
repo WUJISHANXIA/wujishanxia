@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block head %}
+  <link href="{% static 'css/articles.css' %}" rel="stylesheet">
+  <script src="{% static 'js/articles.js' %}"></script>
+    <!--markdown-->
+  <link rel="stylesheet" href="{% static 'editormd/css/editormd.preview.css' %}" />
+   <style>
+            .editormd-html-preview {
+                width: 90%;
+                margin: 0 auto;
+            }
+   </style>
+   <script src="{% static 'editormd/js/jquery.min.js' %}"></script>
+   <script src="{% static 'editormd/lib/marked.min.js' %}"></script>
+   <script src="{% static 'editormd/lib/prettify.min.js' %}"></script>
+
+   <script src="{% static 'editormd/lib/raphael.min.js' %}"></script>
+   <script src="{% static 'editormd/lib/underscore.min.js' %}"></script>
+   <script src="{% static 'editormd/lib/sequence-diagram.min.js' %}"></script>
+   <script src="{% static 'editormd/lib/flowchart.min.js' %}"></script>
+   <script src="{% static 'editormd/lib/jquery.flowchart.min.js' %}"></script>
+
+   <script src="{% static 'editormd/js/editormd.js' %}"></script>
+   <script type="text/javascript">
+            $(function() {
+                var testEditormdView;
+                testEditormdView = editormd.markdownToHTML("test-editormd-view", {
+                    htmlDecode      : "style,script,iframe,img",  // you can filter tags decode
+                    emoji           : true,
+                    taskList        : true,
+                    tex             : true,  // 默认不解析
+                    flowChart       : true,  // 默认不解析
+                    sequenceDiagram : true,  // 默认不解析
+                });
+            });
+        </script>
+    <!--markdown-->
+{% endblock head %}
+
+{% block main %}
+  <ol class="breadcrumb">
+    <li><a href="{% url 'articles' %}">{% trans 'Articles' %}</a></li>
+    <li class="active">{% trans 'Article' %}</li>
+  </ol>
+  {% if article.create_user == request.user %}
+    <div>
+      <a href="{% url 'edit_article' article.pk %}" class="btn btn-primary pull-right">
+        <span class="glyphicon glyphicon-pencil"></span> {% trans "Edit Article" %}
+      </a>
+    </div>
+  {% endif %}
+  {% include 'articles/partial_article.html' with article=article %}
+  {% include 'articles/partial_article_comments.html' with article=article %}
+{% endblock main %}
